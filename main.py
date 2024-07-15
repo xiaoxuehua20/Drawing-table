@@ -361,12 +361,15 @@ def create_b():
     plt.title(title.get())
     # 储存数据
     x1 = []
-    for i in re.findall(r'\d+',x.get('1.0','end')):
+    for i in re.findall(r'\d+\.\d+|\d+',x.get('1.0','end')):
         x1.append(int(i))
     y1 = []
+    result_image_choice = []
+    for item in re.findall(r'\d',choice_image_number.get()):
+        result_image_choice.append(int(item))
     if choose_picture_type.get() == "散点图":
         # 散点图
-        for j in re.findall(r'\d+',y.get('1.0','end')):
+        for j in re.findall(r'\d+\.\d+|\d+',y.get('1.0','end')):
             y1.append(int(j))
         if color.get() == '':
             color_result = None
@@ -380,11 +383,10 @@ def create_b():
             size_result = None
         else:
             size_result = int(size.get())
-        plt.scatter(x1,y1,c=color_result,s=size_result,marker=mark_result)
-        plt.show()
+        axs[result_image_choice[0],result_image_choice[1]].scatter(x1,y1,c=color_result,s=size_result,marker=mark_result)
     elif choose_picture_type.get() == "折线图":
         # 折线图
-        for j in re.findall(r'\d+',y.get('1.0','end')):
+        for j in re.findall(r'\d+\.\d+|\d+',y.get('1.0','end')):
             y1.append(int(j))
         if mark.get() == '':
             mark_result = None
@@ -398,11 +400,10 @@ def create_b():
             size_result = None
         else:
             size_result = int(size.get())
-        plt.plot(x1,y1,lw=size_result,c=color_result,ls=mark_result)
-        plt.show()
+        axs[result_image_choice[0],result_image_choice[1]].plot(x1,y1,lw=size_result,c=color_result,ls=mark_result)
     elif choose_picture_type.get() == "柱状图":
         # 柱状图
-        for j in re.findall(r'\d+',y.get('1.0','end')):
+        for j in re.findall(r'\d+\.\d+|\d+',y.get('1.0','end')):
             y1.append(int(j))
         if color.get() == '':
             color_result = None
@@ -412,8 +413,7 @@ def create_b():
             buttom_result = None
         else:
             buttom_result = buttom.get()
-        plt.bar(x1,y1,color=color_result,bottom=buttom_result)
-        plt.show()
+        axs[result_image_choice[0],result_image_choice[1]].bar(x1,y1,color=color_result,bottom=buttom_result)
     else:
         # 饼图
         if color.get() == '':
@@ -428,8 +428,8 @@ def create_b():
         else:
             explore_result_1 =[]
             explore_result = explore.get()
-            for item in re.findall(r'\d+',explore_result):
-                explore_result_1.append(int(item))
+            for item in re.findall(r'\d+\.\d+|\d+',explore_result):
+                explore_result_1.append(float(item))
         if label.get() == '':
             label_result_1 = None
         else:
@@ -442,7 +442,7 @@ def create_b():
         else:
             percent_result = percent.get()
         if size_label.get() == '':
-            size_label_result = None
+            size_label_result = 0.5
         else:
             size_label_result = float(size_label.get())
         if shadow.get() == '':
@@ -462,11 +462,11 @@ def create_b():
         else:
             direction_result = False
         if size_label_text.get() == '':
-            size_label_text_result = None
+            size_label_text_result = 15
         else:
-            size_label_text_result = int(size_label_text.get())
+            size_label_text_result = float(size_label_text.get())
         if color_label.get() == '':
-            color_label_result = None
+            color_label_result = 'k'
         else:
             color_label_result = color_label.get()
         if center_size.get() == '':
@@ -474,17 +474,39 @@ def create_b():
         else:
             center_size_result = center_size.get()
             center_size_result_1 = []
-            for item in re.findall(r'\d+',center_size_result):
+            for item in re.findall(r'\d+\.\d+|\d+',center_size_result):
                 center_size_result_1.append(int(item))
         if frame_.get() == '':
             frame_result = None
         else:
             frame_result = True
-        plt.pie(x1,explode=explore_result_1,labels=label_result_1,colors=color_result_1,autopct=percent_result,labeldistance=size_label_result,shadow=shadow_result,radius=radius_result,startangle=angle_result,counterclock=direction_result,textprops={f'fontsize':{size_label_text_result},'color':{color_label_result}},center=center_size_result_1,frame=frame_result)
-        plt.show()
+        axs[result_image_choice[0],result_image_choice[1]].pie(x1,explode=explore_result_1,labels=label_result_1,colors=color_result_1,autopct=percent_result,labeldistance=size_label_result,shadow=shadow_result,radius=radius_result,startangle=angle_result,counterclock=direction_result,textprops={'fontsize':size_label_text_result,'color':color_label_result},center=center_size_result_1,frame=frame_result)
+         
+# 绘制多图
+tk.Label(window,text="绘制多图",font=20,width=8,height=2).place(x=440,y=110)
+image_number = tk.Entry(window,show=None)
+image_number.place(x=520,y=120)
+tk.Label(window,text="图数",font=20,width=5,height=2).place(x=680,y=110)
+choice_image_number = tk.Entry(window,show=None)
+choice_image_number.place(x=730,y=120)
+
+def create_d():
+    global axs
+    result_image = []
+    for item in re.findall(r'\d',image_number.get()):
+        result_image.append(int(item))     
+    fig,axs = plt.subplots(result_image[0],result_image[1])
         
+# 绘制生成
+create_image = tk.Button(window,text="多图生成",font=20,width=8,height=1,command=create_b)
+create_image.place(x=890,y=115)
+image_choice = tk.Button(window,text="确定",font=20,width=5,height=1,command=create_d)
+image_choice.place(x=520,y=150)
+
 # 生成按钮
-create = tk.Button(window,text="生成",font=20,bg='#9da5b4',fg='#23272e',highlightbackground='black',width=30,height=5,command=create_b)
+def create_c():
+    plt.show()
+create = tk.Button(window,text="生成",font=20,bg='#9da5b4',fg='#23272e',highlightbackground='black',width=30,height=5,command=create_c)
 create.pack()
 
 window.mainloop()
